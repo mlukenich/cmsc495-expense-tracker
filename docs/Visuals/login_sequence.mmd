@@ -1,0 +1,29 @@
+---
+title: Login Flow (JWT Authentication)
+---
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as React Frontend
+    participant GW as API Gateway
+    participant AUTH as Auth Service
+    participant DB as PostgreSQL
+
+    U->>FE: Enter email + password
+    FE->>GW: POST /auth/login
+    GW->>AUTH: Forward login request
+    AUTH->>DB: Query user by email
+    DB-->>AUTH: User data (hashed password)
+    AUTH->>AUTH: Verify BCrypt hash
+
+    alt Credentials valid
+        AUTH->>AUTH: Generate JWT (claims)
+        AUTH-->>GW: 200 OK + JWT
+        GW-->>FE: 200 OK + JWT
+        FE->>FE: Store JWT (state / storage)
+        FE-->>U: Redirect to dashboard
+    else Credentials invalid
+        AUTH-->>GW: 401 Unauthorized
+        GW-->>FE: 401 Unauthorized
+        FE-->>U: Display "Invalid credentials"
+    end

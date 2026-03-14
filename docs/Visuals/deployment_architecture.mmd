@@ -1,0 +1,54 @@
+---
+title: Cloud-Native Expense Tracker Architecture
+---
+flowchart LR
+    USER([User / Browser])
+
+    subgraph PLATFORM[Docker Container Platform]
+        direction LR
+
+        FE[React Frontend Container]
+
+        subgraph BACKEND[Backend Microservices]
+            direction TB
+            GW[API Gateway]
+            AUTH[Auth Service]
+            EXP[Expense Service]
+            ANA[Analytics Service]
+        end
+
+        DB[(PostgreSQL Database)]
+
+        subgraph OBS[Observability Stack]
+            direction TB
+            GRAF[Grafana]
+            PROM[Prometheus]
+        end
+    end
+
+    USER --> FE
+    USER --> GW
+
+    FE --> GW
+    GW --> AUTH
+    GW --> EXP
+    GW --> ANA
+
+    AUTH --> DB
+    EXP --> DB
+    ANA --> DB
+
+    AUTH -.metrics.-> PROM
+    EXP -.metrics.-> PROM
+    ANA -.metrics.-> PROM
+    PROM --> GRAF
+
+    classDef app fill:#eef2ff,stroke:#6366f1,stroke-width:1.5px,color:#111827;
+    classDef db fill:#ecfeff,stroke:#0891b2,stroke-width:1.5px,color:#111827;
+    classDef obs fill:#f5f3ff,stroke:#7c3aed,stroke-width:1.5px,color:#111827;
+    classDef zone fill:#f8fafc,stroke:#94a3b8,stroke-width:1.2px,color:#0f172a;
+
+    class FE,GW,AUTH,EXP,ANA app;
+    class DB db;
+    class PROM,GRAF obs;
+    class BACKEND,OBS,PLATFORM zone;
