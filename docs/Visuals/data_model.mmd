@@ -1,0 +1,31 @@
+---
+title: Expense Tracker Data Model
+---
+erDiagram
+    USER ||--o{ CATEGORY : "defines"
+    USER ||--o{ EXPENSE : "manages"
+    CATEGORY ||--o{ EXPENSE : "classifies"
+
+    USER {
+        bigint id PK
+        string email UK
+        string password_hash
+        timestamp created_at
+    }
+
+    CATEGORY {
+        bigint id PK
+        bigint user_id FK "Null for system defaults"
+        string name
+        boolean is_default
+    }
+
+    EXPENSE {
+        bigint id PK
+        bigint user_id FK
+        bigint category_id FK
+        decimal amount
+        string description
+        date transaction_date
+        timestamp created_at
+    }
