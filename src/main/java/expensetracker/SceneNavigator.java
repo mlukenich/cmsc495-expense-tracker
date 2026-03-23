@@ -3,12 +3,19 @@ package expensetracker;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.springframework.context.ConfigurableApplicationContext;
 
 public class SceneNavigator {
 	private static Stage primaryStage;
+	private static ConfigurableApplicationContext springContext;
 
-	public static void initialize(Stage stage) {
+	public static void initialize(Stage stage, ConfigurableApplicationContext context) {
 		primaryStage = stage;
+		springContext = context;
+	}
+
+	public static ConfigurableApplicationContext getSpringContext() {
+		return springContext;
 	}
 
 	public static void switchScene(Parent root, String title) {

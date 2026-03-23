@@ -11,9 +11,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import org.springframework.context.ConfigurableApplicationContext;
 
 public class LoginView {
-	private final AuthenticationService authenticationService = new AuthenticationService();
+	private final ConfigurableApplicationContext springContext;
+	private final AuthenticationService authenticationService;
+
+	public LoginView(ConfigurableApplicationContext springContext) {
+		this.springContext = springContext;
+		this.authenticationService = springContext.getBean(AuthenticationService.class);
+	}
 
 	public Parent createView() {
 		Label titleLabel = new Label("Personal Expense Tracker");
@@ -38,7 +45,7 @@ public class LoginView {
 			);
 
 			if (authenticatedUser != null) {
-				DashboardView dashboardView = new DashboardView(authenticatedUser);
+				DashboardView dashboardView = new DashboardView(authenticatedUser, springContext);
 				SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
 			} else {
 				statusLabel.setText("Invalid email or password.");
@@ -53,7 +60,7 @@ public class LoginView {
 			);
 
 			if (registeredUser != null) {
-				DashboardView dashboardView = new DashboardView(registeredUser);
+				DashboardView dashboardView = new DashboardView(registeredUser, springContext);
 				SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
 			} else {
 				statusLabel.setText("Registration failed. Email may already exist.");

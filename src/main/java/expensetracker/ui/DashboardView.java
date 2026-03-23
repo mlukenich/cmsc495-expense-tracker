@@ -23,6 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,8 +31,9 @@ import java.util.Optional;
 
 public class DashboardView {
 	private final User currentUser;
-	private final ExpenseService expenseService = new ExpenseService();
-	private final CategoryService categoryService = new CategoryService();
+	private final ConfigurableApplicationContext springContext;
+	private final ExpenseService expenseService;
+	private final CategoryService categoryService;
 
 	private final TableView<Expense> expenseTableView = new TableView<>();
 	private final ComboBox<Category> categoryComboBox = new ComboBox<>();
@@ -43,8 +45,11 @@ public class DashboardView {
 	private final PieChart categoryPieChart = new PieChart();
 	private final BarChart<String, Number> categoryBarChart = new BarChart<>(new CategoryAxis(), new NumberAxis());
 
-	public DashboardView(User currentUser) {
+	public DashboardView(User currentUser, ConfigurableApplicationContext springContext) {
 		this.currentUser = currentUser;
+		this.springContext = springContext;
+		this.expenseService = springContext.getBean(ExpenseService.class);
+		this.categoryService = springContext.getBean(CategoryService.class);
 	}
 
 	public Parent createView() {
@@ -52,7 +57,7 @@ public class DashboardView {
 		welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
 		Button logoutButton = new Button("Logout");
-		logoutButton.setOnAction(event -> SceneNavigator.switchScene(new LoginView().createView(), "Personal Expense Tracker"));
+		logoutButton.setOnAction(event -> SceneNavigator.switchScene(new LoginView(springContext).createView(), "Personal Expense Tracker"));
 
 		HBox topBar = new HBox(12, welcomeLabel, logoutButton);
 		topBar.setAlignment(Pos.CENTER_LEFT);
