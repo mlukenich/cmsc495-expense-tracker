@@ -1,4 +1,4 @@
-package expensetracker;
+package com.expensetracker.ui.util;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;

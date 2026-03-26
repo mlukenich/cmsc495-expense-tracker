@@ -1,8 +1,8 @@
-package expensetracker.ui;
+package com.expensetracker.ui.view;
 
-import expensetracker.SceneNavigator;
-import expensetracker.model.User;
-import expensetracker.service.AuthenticationService;
+import com.expensetracker.ui.util.SceneNavigator;
+import com.expensetracker.model.User;
+import com.expensetracker.service.AuthenticationService;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

@@ -1,4 +1,4 @@
-package expensetracker.model;
+package com.expensetracker.model;
 
 public class User {
 	private final int id;

@@ -1,6 +1,8 @@
-package expensetracker;
+package com.expensetracker;
 
-import expensetracker.ui.LoginView;
+import com.expensetracker.repository.DatabaseManager;
+import com.expensetracker.ui.util.SceneNavigator;
+import com.expensetracker.ui.view.LoginView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
