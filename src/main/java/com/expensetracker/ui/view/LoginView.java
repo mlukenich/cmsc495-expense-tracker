@@ -24,19 +24,24 @@ public class LoginView {
 
 	public Parent createView() {
 		Label titleLabel = new Label("Personal Expense Tracker");
+		titleLabel.setId("loginTitle");
 		titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
 		TextField emailTextField = new TextField();
+		emailTextField.setId("emailField");
 		emailTextField.setPromptText("Email");
 		emailTextField.setMaxWidth(320);
 
 		PasswordField passwordField = new PasswordField();
+		passwordField.setId("passwordField");
 		passwordField.setPromptText("Password");
 		passwordField.setMaxWidth(320);
 
 		Label statusLabel = new Label();
+		statusLabel.setId("statusLabel");
 
 		Button loginButton = new Button("Login");
+		loginButton.setId("loginButton");
 		loginButton.setDefaultButton(true);
 		loginButton.setOnAction(event -> {
 			User authenticatedUser = authenticationService.authenticateUser(
@@ -53,6 +58,7 @@ public class LoginView {
 		});
 
 		Button registerButton = new Button("Register");
+		registerButton.setId("registerButton");
 		registerButton.setOnAction(event -> {
 			User registeredUser = authenticationService.registerUser(
 				emailTextField.getText(),

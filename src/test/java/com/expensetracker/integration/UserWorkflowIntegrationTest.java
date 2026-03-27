@@ -29,10 +29,18 @@ class UserWorkflowIntegrationTest {
 	@Autowired
 	private ExpenseService expenseService;
 
+	@Autowired
+	private com.expensetracker.repository.DatabaseManager databaseManager;
+
+	@org.junit.jupiter.api.BeforeEach
+	void setUp() {
+		databaseManager.initializeDatabase();
+	}
+
 	@Test
 	void testFullUserWorkflow() {
 		// 1. Register a new user
-		String email = "integration@test.com";
+		String email = "integration_" + System.currentTimeMillis() + "@test.com";
 		String password = "securepassword";
 		User user = authService.registerUser(email, password);
 		
