@@ -1,11 +1,11 @@
-package expensetracker.ui;
+package com.expensetracker.ui.view;
 
-import expensetracker.SceneNavigator;
-import expensetracker.model.Category;
-import expensetracker.model.Expense;
-import expensetracker.model.User;
-import expensetracker.service.CategoryService;
-import expensetracker.service.ExpenseService;
+import com.expensetracker.ui.util.SceneNavigator;
+import com.expensetracker.model.Category;
+import com.expensetracker.model.Expense;
+import com.expensetracker.model.User;
+import com.expensetracker.service.CategoryService;
+import com.expensetracker.service.ExpenseService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;

@@ -1,6 +1,6 @@
-package expensetracker.service;
+package com.expensetracker.service;
 
-import expensetracker.model.Expense;
+import com.expensetracker.model.Expense;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 

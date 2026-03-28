@@ -1,4 +1,4 @@
-package expensetracker.model;
+package com.expensetracker.model;
 
 public class Category {
 	private final int id;
