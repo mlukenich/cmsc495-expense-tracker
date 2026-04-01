@@ -50,13 +50,24 @@ public class DashboardView {
 		this.springContext = springContext;
 		this.expenseService = springContext.getBean(ExpenseService.class);
 		this.categoryService = springContext.getBean(CategoryService.class);
+
+		// Initialize IDs
+		expenseTableView.setId("expenseTable");
+		categoryComboBox.setId("categoryCombo");
+		amountTextField.setId("amountField");
+		descriptionTextField.setId("descriptionField");
+		transactionDatePicker.setId("datePicker");
+		searchTextField.setId("searchField");
+		totalLabel.setId("totalLabel");
 	}
 
 	public Parent createView() {
 		Label welcomeLabel = new Label("Logged in as: " + currentUser.getEmail());
+		welcomeLabel.setId("welcomeLabel");
 		welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
 		Button logoutButton = new Button("Logout");
+		logoutButton.setId("logoutButton");
 		logoutButton.setOnAction(event -> SceneNavigator.switchScene(new LoginView(springContext).createView(), "Personal Expense Tracker"));
 
 		HBox topBar = new HBox(12, welcomeLabel, logoutButton);
@@ -92,22 +103,27 @@ public class DashboardView {
 		searchTextField.setPromptText("Search by category, description, or date");
 
 		Button addExpenseButton = new Button("Add Expense");
+		addExpenseButton.setId("addExpenseButton");
 		addExpenseButton.setMaxWidth(Double.MAX_VALUE);
 		addExpenseButton.setOnAction(event -> addExpense());
 
 		Button updateSelectedExpenseButton = new Button("Update Selected");
+		updateSelectedExpenseButton.setId("updateButton");
 		updateSelectedExpenseButton.setMaxWidth(Double.MAX_VALUE);
 		updateSelectedExpenseButton.setOnAction(event -> updateSelectedExpense());
 
 		Button deleteSelectedExpenseButton = new Button("Delete Selected");
+		deleteSelectedExpenseButton.setId("deleteButton");
 		deleteSelectedExpenseButton.setMaxWidth(Double.MAX_VALUE);
 		deleteSelectedExpenseButton.setOnAction(event -> deleteSelectedExpense());
 
 		Button addCategoryButton = new Button("Add Custom Category");
+		addCategoryButton.setId("addCategoryButton");
 		addCategoryButton.setMaxWidth(Double.MAX_VALUE);
 		addCategoryButton.setOnAction(event -> addCustomCategory());
 
 		Button searchButton = new Button("Search");
+		searchButton.setId("searchButton");
 		searchButton.setMaxWidth(Double.MAX_VALUE);
 		searchButton.setOnAction(event -> refreshExpenseData());
 
