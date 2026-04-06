@@ -1,0 +1,12 @@
+com\expensetracker\service\ExpenseService.class
+com\expensetracker\ui\util\SceneNavigator.class
+com\expensetracker\model\Category.class
+com\expensetracker\model\Expense.class
+com\expensetracker\repository\DatabaseManager.class
+com\expensetracker\service\AuthenticationService.class
+com\expensetracker\ui\view\LoginView.class
+com\expensetracker\service\ExpenseService$CategoryTotal.class
+com\expensetracker\service\CategoryService.class
+com\expensetracker\MainApp.class
+com\expensetracker\ui\view\DashboardView.class
+com\expensetracker\model\User.class

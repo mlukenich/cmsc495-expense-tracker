@@ -5,25 +5,15 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.annotation.PostConstruct;
 
-/**
- * Manages the database initialization and seeding.
- */
 @Repository
 public class DatabaseManager {
 
 	private final JdbcTemplate jdbcTemplate;
 
-	/**
-	 * Constructs a new DatabaseManager with the specified JdbcTemplate.
-	 * @param jdbcTemplate the JdbcTemplate to use for database operations
-	 */
 	public DatabaseManager(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	/**
-	 * Initializes the database by creating the necessary tables and seeding default categories.
-	 */
 	@PostConstruct
 	public void initializeDatabase() {
 		jdbcTemplate.execute("""
@@ -62,9 +52,6 @@ public class DatabaseManager {
 		seedDefaultCategories();
 	}
 
-	/**
-	 * Seeds the database with default categories.
-	 */
 	private void seedDefaultCategories() {
 		String[] defaultCategories = {
 			"Food",

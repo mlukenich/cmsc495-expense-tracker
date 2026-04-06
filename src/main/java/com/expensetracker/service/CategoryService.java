@@ -6,26 +6,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Provides services for managing expense categories.
- */
 @Service
 public class CategoryService {
 	private final JdbcTemplate jdbcTemplate;
 
-	/**
-	 * Constructs a new CategoryService with the specified JdbcTemplate.
-	 * @param jdbcTemplate the JdbcTemplate to use for database operations
-	 */
 	public CategoryService(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	/**
-	 * Retrieves a list of categories for the specified user. This includes both default categories (where user_id is null) and custom categories created by the user.
-	 * @param userId the ID of the user for whom to retrieve categories
-	 * @return a list of Category objects associated with the user
-	 */
 	public List<Category> getCategoriesForUser(int userId) {
 		String sql = """
 			SELECT id, user_id, name, is_default
@@ -45,11 +33,6 @@ public class CategoryService {
 		}, userId);
 	}
 
-	/**
-	 * Adds a new custom category for the specified user with the given category name. The new category will have is_default set to false.
-	 * @param userId the ID of the user for whom to add the category
-	 * @param categoryName the name of the new category to add
-	 */
 	public void addCustomCategory(int userId, String categoryName) {
 		String sql = "INSERT INTO category (user_id, name, is_default) VALUES (?, ?, 0)";
 		jdbcTemplate.update(sql, userId, categoryName.trim());

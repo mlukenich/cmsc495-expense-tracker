@@ -1,29 +1,27 @@
 ---
-title: Login Flow (JWT Authentication)
+title: Login Flow (Desktop Application)
 ---
 sequenceDiagram
     autonumber
     actor U as User
-    participant FE as React Frontend
-    participant GW as API Gateway
-    participant AUTH as Auth Service
-    participant DB as PostgreSQL
+    participant LV as LoginView
+    participant AUTH as AuthenticationService
+    participant JDBC as JdbcTemplate
+    participant DB as SQLite
 
-    U->>FE: Enter email + password
-    FE->>GW: POST /auth/login
-    GW->>AUTH: Forward login request
-    AUTH->>DB: Query user by email
-    DB-->>AUTH: User data (hashed password)
-    AUTH->>AUTH: Verify BCrypt hash
+    U->>LV: Enter email + password
+    LV->>AUTH: authenticateUser(email, password)
+    AUTH->>JDBC: SELECT user by normalized email
+    JDBC->>DB: Execute query
+    DB-->>JDBC: User row with password_hash
+    JDBC-->>AUTH: Result set
+    AUTH->>AUTH: Hash provided password and compare
 
     alt Credentials valid
-        AUTH->>AUTH: Generate JWT (claims)
-        AUTH-->>GW: 200 OK + JWT
-        GW-->>FE: 200 OK + JWT
-        FE->>FE: Store JWT (state / storage)
-        FE-->>U: Redirect to dashboard
+        AUTH-->>LV: User object
+        LV->>LV: Build DashboardView
+        LV-->>U: Switch scene to dashboard
     else Credentials invalid
-        AUTH-->>GW: 401 Unauthorized
-        GW-->>FE: 401 Unauthorized
-        FE-->>U: Display "Invalid credentials"
+        AUTH-->>LV: null
+        LV-->>U: Display "Invalid email or password."
     end

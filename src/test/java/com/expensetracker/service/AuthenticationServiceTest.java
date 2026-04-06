@@ -79,4 +79,18 @@ class AuthenticationServiceTest {
 
 		assertThat(result).isNull();
 	}
+
+	@Test
+	void registerUser_Failure_BlankEmail() {
+		User result = authenticationService.registerUser("   ", testPassword);
+
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void authenticateUser_Failure_BlankPassword() {
+		User result = authenticationService.authenticateUser(testEmail, "   ");
+
+		assertThat(result).isNull();
+	}
 }

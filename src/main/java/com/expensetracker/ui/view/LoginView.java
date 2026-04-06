@@ -13,26 +13,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * A view for handling user login and registration functionality.
- */
 public class LoginView {
 	private final ConfigurableApplicationContext springContext;
 	private final AuthenticationService authenticationService;
 
-	/**
-	 * Constructs a new LoginView with the specified Spring application context. The constructor retrieves the AuthenticationService bean from the context for handling authentication operations.
-	 * @param springContext the Spring application context to use for retrieving beans
-	 */
 	public LoginView(ConfigurableApplicationContext springContext) {
 		this.springContext = springContext;
 		this.authenticationService = springContext.getBean(AuthenticationService.class);
 	}
 
-	/**
-	 * Creates and returns the JavaFX Parent node representing the login view. This method sets up the UI components for email input, password input, login and registration buttons, and status messages. It also defines the event handlers for the buttons to perform authentication and registration actions.
-	 * @return the Parent node containing the login view UI
-	 */
 	public Parent createView() {
 		Label titleLabel = new Label("Personal Expense Tracker");
 		titleLabel.setId("loginTitle");
@@ -55,32 +44,44 @@ public class LoginView {
 		loginButton.setId("loginButton");
 		loginButton.setDefaultButton(true);
 		loginButton.setOnAction(event -> {
-			User authenticatedUser = authenticationService.authenticateUser(
-				emailTextField.getText(),
-				passwordField.getText()
-			);
+			try {
+				User authenticatedUser = authenticationService.authenticateUser(
+					emailTextField.getText(),
+					passwordField.getText()
+				);
 
-			if (authenticatedUser != null) {
-				DashboardView dashboardView = new DashboardView(authenticatedUser, springContext);
-				SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
-			} else {
-				statusLabel.setText("Invalid email or password.");
+				if (authenticatedUser != null) {
+					DashboardView dashboardView = new DashboardView(authenticatedUser, springContext);
+					SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
+				} else {
+					statusLabel.setText("Invalid email or password.");
+				}
+			} catch (Throwable throwable) {
+				throwable.printStackTrace();
+				String details = throwable.getMessage() == null ? "" : " - " + throwable.getMessage();
+				statusLabel.setText("Login failed: " + throwable.getClass().getSimpleName() + details);
 			}
 		});
 
 		Button registerButton = new Button("Register");
 		registerButton.setId("registerButton");
 		registerButton.setOnAction(event -> {
-			User registeredUser = authenticationService.registerUser(
-				emailTextField.getText(),
-				passwordField.getText()
-			);
+			try {
+				User registeredUser = authenticationService.registerUser(
+					emailTextField.getText(),
+					passwordField.getText()
+				);
 
-			if (registeredUser != null) {
-				DashboardView dashboardView = new DashboardView(registeredUser, springContext);
-				SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
-			} else {
-				statusLabel.setText("Registration failed. Email may already exist.");
+				if (registeredUser != null) {
+					DashboardView dashboardView = new DashboardView(registeredUser, springContext);
+					SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
+				} else {
+					statusLabel.setText("Registration failed. Email may already exist.");
+				}
+			} catch (Throwable throwable) {
+				throwable.printStackTrace();
+				String details = throwable.getMessage() == null ? "" : " - " + throwable.getMessage();
+				statusLabel.setText("Registration failed: " + throwable.getClass().getSimpleName() + details);
 			}
 		});
 

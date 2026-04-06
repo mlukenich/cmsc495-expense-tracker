@@ -29,9 +29,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * A view for displaying the user's dashboard, including expense entries, charts, and summary information.
- */
 public class DashboardView {
 	private final User currentUser;
 	private final ConfigurableApplicationContext springContext;
@@ -48,11 +45,6 @@ public class DashboardView {
 	private final PieChart categoryPieChart = new PieChart();
 	private final BarChart<String, Number> categoryBarChart = new BarChart<>(new CategoryAxis(), new NumberAxis());
 
-	/**
-	 * Constructs a new DashboardView for the specified user and Spring application context. The constructor initializes the necessary services and UI components for displaying the dashboard.
-	 * @param currentUser the currently logged-in user for whom to display the dashboard
-	 * @param springContext the Spring application context to access services and manage dependencies
-	 */
 	public DashboardView(User currentUser, ConfigurableApplicationContext springContext) {
 		this.currentUser = currentUser;
 		this.springContext = springContext;
@@ -69,10 +61,6 @@ public class DashboardView {
 		totalLabel.setId("totalLabel");
 	}
 
-	/**
-	 * Creates and returns the main view for the dashboard, including the top bar with user information and logout button, the expense entry form, the expense table, and the charts. This method sets up all UI components and their event handlers to provide a functional dashboard experience for the user.
-	 * @return the root Parent node containing the entire dashboard view
-	 */
 	public Parent createView() {
 		Label welcomeLabel = new Label("Logged in as: " + currentUser.getEmail());
 		welcomeLabel.setId("welcomeLabel");
@@ -106,10 +94,6 @@ public class DashboardView {
 		return rootContainer;
 	}
 
-	/*
-	 * Builds the section for the expense entry form, including input fields and action buttons.
-	 * @return the VBox containing the expense form section
-	 */
 	private VBox buildExpenseFormSection() {
 		Label formTitleLabel = new Label("Expense Entry");
 		formTitleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -175,10 +159,6 @@ public class DashboardView {
 		return formSection;
 	}
 
-	/*
-	 * Builds the section for displaying the expense table, including the total amount label and the table view itself.
-	 * @return the VBox containing the expense table section
-	 */
 	private VBox buildExpenseTableSection() {
 		Label tableTitleLabel = new Label("Expenses");
 		tableTitleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -206,10 +186,6 @@ public class DashboardView {
 		return tableSection;
 	}
 
-	/*
-	 * Builds the section for displaying the charts, including a pie chart for expense breakdown and a bar chart for spending by category.
-	 * @return the VBox containing the charts section
-	 */
 	private VBox buildChartSection() {
 		Label chartTitleLabel = new Label("Reports");
 		chartTitleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -225,9 +201,6 @@ public class DashboardView {
 		return chartSection;
 	}
 
-	/*
-	 * Configures the expense table by setting up its columns and data binding.
-	 */
 	private void configureExpenseTable() {
 		TableColumn<Expense, Integer> idColumn = new TableColumn<>("ID");
 		idColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getId()));
@@ -248,16 +221,10 @@ public class DashboardView {
 		expenseTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 	}
 
-	/*
-	 * Configures the charts by setting titles and other properties.
-	 */
 	private void configureCharts() {
 		categoryPieChart.setTitle("Expense Breakdown");
 	}
 
-	/*
-	 * Refreshes the list of categories in the category combo box by fetching the latest categories for the user from the CategoryService.
-	 */
 	private void refreshCategories() {
 		List<Category> categories = categoryService.getCategoriesForUser(currentUser.getId());
 		categoryComboBox.setItems(FXCollections.observableArrayList(categories));
@@ -266,9 +233,6 @@ public class DashboardView {
 		}
 	}
 
-	/*
-	 * Refreshes the expense data displayed in the table and updates the total amount label and charts based on the latest data for the user.
-	 */
 	private void refreshExpenseData() {
 		List<Expense> expenses = expenseService.getExpensesForUser(currentUser.getId(), searchTextField.getText());
 		expenseTableView.setItems(FXCollections.observableArrayList(expenses));
@@ -279,9 +243,6 @@ public class DashboardView {
 		refreshCharts();
 	}
 
-	/*
-	 * Refreshes the data displayed in the charts by fetching the latest category totals for the user and updating the pie chart and bar chart accordingly.
-	 */
 	private void refreshCharts() {
 		List<ExpenseService.CategoryTotal> categoryTotals = expenseService.getCategoryTotalsForUser(currentUser.getId());
 
@@ -297,9 +258,6 @@ public class DashboardView {
 		categoryBarChart.getData().add(barChartSeries);
 	}
 
-	/*
-	 * Handles the action of adding a new expense based on the input fields in the form. Validates the input, calls the ExpenseService to add the expense, and refreshes the displayed data.
-	 */
 	private void addExpense() {
 		Category selectedCategory = categoryComboBox.getValue();
 		if (selectedCategory == null || amountTextField.getText().isBlank() || transactionDatePicker.getValue() == null) {
@@ -309,6 +267,11 @@ public class DashboardView {
 
 		try {
 			double amount = Double.parseDouble(amountTextField.getText().trim());
+			if (amount < 0) {
+				showAlert("Amount must be zero or greater.");
+				return;
+			}
+
 			expenseService.addExpense(
 				currentUser.getId(),
 				selectedCategory.getId(),
@@ -323,20 +286,22 @@ public class DashboardView {
 		}
 	}
 
-	/*
-	 * Handles the action of updating the selected expense based on the input fields in the form. Validates the input, calls the ExpenseService to update the expense, and refreshes the displayed data.
-	 */
 	private void updateSelectedExpense() {
 		Expense selectedExpense = expenseTableView.getSelectionModel().getSelectedItem();
 		Category selectedCategory = categoryComboBox.getValue();
 
-		if (selectedExpense == null || selectedCategory == null) {
+		if (selectedExpense == null || selectedCategory == null || transactionDatePicker.getValue() == null) {
 			showAlert("Please select an expense to update.");
 			return;
 		}
 
 		try {
 			double amount = Double.parseDouble(amountTextField.getText().trim());
+			if (amount < 0) {
+				showAlert("Amount must be zero or greater.");
+				return;
+			}
+
 			expenseService.updateExpense(
 				selectedExpense.getId(),
 				selectedCategory.getId(),
@@ -351,9 +316,6 @@ public class DashboardView {
 		}
 	}
 
-	/*
-	 * Handles the action of deleting the selected expense. Prompts the user for confirmation before calling the ExpenseService to delete the expense and refreshing the displayed data.
-	 */
 	private void deleteSelectedExpense() {
 		Expense selectedExpense = expenseTableView.getSelectionModel().getSelectedItem();
 		if (selectedExpense == null) {
@@ -374,9 +336,6 @@ public class DashboardView {
 		}
 	}
 
-	/*
-	 * Handles the action of adding a new custom category by prompting the user for the category name, validating the input, calling the CategoryService to add the category, and refreshing the category list.
-	 */
 	private void addCustomCategory() {
 		TextInputDialog categoryNameDialog = new TextInputDialog();
 		categoryNameDialog.setTitle("Add Category");
@@ -388,13 +347,12 @@ public class DashboardView {
 			if (!categoryName.isBlank()) {
 				categoryService.addCustomCategory(currentUser.getId(), categoryName.trim());
 				refreshCategories();
+			} else {
+				showAlert("Category name cannot be blank.");
 			}
 		});
 	}
 
-	/*
-	 * Clears the input fields in the expense form and deselects any selected expense in the table.
-	 */
 	private void clearForm() {
 		amountTextField.clear();
 		descriptionTextField.clear();
@@ -402,10 +360,6 @@ public class DashboardView {
 		expenseTableView.getSelectionModel().clearSelection();
 	}
 
-	/*
-	 * Displays an informational alert with the specified message. This method is used to show validation errors and other messages to the user.
-	 * @param message the message to display in the alert
-	 */
 	private void showAlert(String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Expense Tracker");
