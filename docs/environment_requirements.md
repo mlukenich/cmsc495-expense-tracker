@@ -54,3 +54,82 @@ Alternatively, you can run the compiled package directly (if it has been success
 ```bash
 java -jar target/cmsc495-expense-tracker-1.0-SNAPSHOT.jar
 ```
+
+---
+
+## Docker
+
+Docker containerizes the application so no local JDK, Maven, or JavaFX installation is required. The JavaFX UI is rendered inside the container using a virtual display and streamed to your browser via noVNC (https://novnc.com/).
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows / macOS) or Docker Engine (Linux)
+
+---
+
+### Running the application
+
+**1. Build the image and start the container:**
+
+```bash
+docker compose up --build
+```
+
+**2. Open the application in your browser:**
+
+```
+http://localhost:6080/vnc.html
+```
+
+The application window will appear in your browser tab. This works the same way on Windows, macOS, and Linux — no additional setup required.
+
+**3. Stop the container:**
+
+```bash
+docker compose down
+```
+
+---
+
+### How it works
+
+The container runs three background services before launching the Java application:
+
+| Service                | Role                                                                                    |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| **Xvfb**               | Virtual X11 framebuffer — gives JavaFX a display to render to without a physical screen |
+| **x11vnc**             | Exposes the virtual display as a VNC stream on `localhost:5900` (container-internal)    |
+| **noVNC + websockify** | Proxies the VNC stream over WebSocket and serves the HTML5 client at port 6080          |
+
+---
+
+### Data persistence
+
+The SQLite database is stored in a Docker named volume (`expense-data`) mounted at `/data` inside the container. The data survives container restarts and `docker compose down`.
+
+```bash
+# Inspect volume location on the host
+docker volume inspect cmsc495-expense-tracker_expense-data
+
+# Stop containers but keep the volume
+docker compose down
+
+# Stop containers AND delete the volume (all data lost)
+docker compose down -v
+```
+
+### Useful Docker commands
+
+```bash
+# Rebuild image after source changes
+docker compose up --build
+
+# Run in the background (browser UI still available at localhost:6080)
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop and remove containers
+docker compose down
+```
