@@ -1,0 +1,22 @@
+# Build output – rebuilt inside the container
+target/
+
+# Version control metadata
+.git/
+.gitignore
+
+# Editor/IDE config
+.vscode/
+*.iml
+.idea/
+
+# Local database files (not needed in the image; data is injected via volume)
+*.db
+
+# Documentation and non-source files
+docs/
+*.md
+
+# OS artefacts
+.DS_Store
+Thumbs.db

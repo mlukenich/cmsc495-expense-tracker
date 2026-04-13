@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    image: cmsc495-expense-tracker
+
+    ports:
+      # noVNC web UI – open http://localhost:6080/vnc.html in any browser.
+      - "6080:6080"
+
+    environment:
+      # Override the database path to write into the persistent volume.
+      # Spring Boot maps SPRING_DATASOURCE_URL → spring.datasource.url.
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:/data/expense_tracker.db
+
+    volumes:
+      # Named volume keeps the SQLite database across container restarts.
+      - expense-data:/data
+
+volumes:
+  # Docker-managed volume; survives `docker compose down`.
+  # Inspect: docker volume inspect cmsc495-expense-tracker_expense-data
+  expense-data:
+    driver: local
