@@ -1,54 +1,50 @@
 ---
-title: Cloud-Native Expense Tracker Architecture
+title: Personal Expense Tracker Desktop Architecture
 ---
 flowchart LR
-    USER([User / Browser])
+    USER([End User])
 
-    subgraph PLATFORM[Docker Container Platform]
-        direction LR
+    subgraph DESKTOP[Desktop Application]
+        direction TB
+        MAIN[MainApp / Spring Boot Bootstrap]
 
-        FE[React Frontend Container]
-
-        subgraph BACKEND[Backend Microservices]
-            direction TB
-            GW[API Gateway]
-            AUTH[Auth Service]
-            EXP[Expense Service]
-            ANA[Analytics Service]
+        subgraph UI[JavaFX Presentation Layer]
+            direction LR
+            LOGIN[LoginView]
+            DASH[DashboardView]
+            NAV[SceneNavigator]
         end
 
-        DB[(PostgreSQL Database)]
-
-        subgraph OBS[Observability Stack]
-            direction TB
-            GRAF[Grafana]
-            PROM[Prometheus]
+        subgraph SERVICE[Service Layer]
+            direction LR
+            AUTH[AuthenticationService]
+            CAT[CategoryService]
+            EXP[ExpenseService]
         end
+
+        DBM[DatabaseManager]
     end
 
-    USER --> FE
-    USER --> GW
+    DB[(SQLite Database File)]
 
-    FE --> GW
-    GW --> AUTH
-    GW --> EXP
-    GW --> ANA
-
+    USER --> LOGIN
+    LOGIN --> AUTH
+    DASH --> CAT
+    DASH --> EXP
+    LOGIN --> NAV
+    DASH --> NAV
+    MAIN --> UI
+    MAIN --> SERVICE
+    MAIN --> DBM
     AUTH --> DB
+    CAT --> DB
     EXP --> DB
-    ANA --> DB
+    DBM --> DB
 
-    AUTH -.metrics.-> PROM
-    EXP -.metrics.-> PROM
-    ANA -.metrics.-> PROM
-    PROM --> GRAF
-
-    classDef app fill:#eef2ff,stroke:#6366f1,stroke-width:1.5px,color:#111827;
+    classDef app fill:#eef2ff,stroke:#2563eb,stroke-width:1.5px,color:#111827;
     classDef db fill:#ecfeff,stroke:#0891b2,stroke-width:1.5px,color:#111827;
-    classDef obs fill:#f5f3ff,stroke:#7c3aed,stroke-width:1.5px,color:#111827;
     classDef zone fill:#f8fafc,stroke:#94a3b8,stroke-width:1.2px,color:#0f172a;
 
-    class FE,GW,AUTH,EXP,ANA app;
+    class MAIN,LOGIN,DASH,NAV,AUTH,CAT,EXP,DBM app;
     class DB db;
-    class PROM,GRAF obs;
-    class BACKEND,OBS,PLATFORM zone;
+    class DESKTOP,UI,SERVICE zone;
