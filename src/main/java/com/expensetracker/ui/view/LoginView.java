@@ -55,32 +55,44 @@ public class LoginView {
 		loginButton.setId("loginButton");
 		loginButton.setDefaultButton(true);
 		loginButton.setOnAction(event -> {
-			User authenticatedUser = authenticationService.authenticateUser(
-				emailTextField.getText(),
-				passwordField.getText()
-			);
+			try {
+				User authenticatedUser = authenticationService.authenticateUser(
+					emailTextField.getText(),
+					passwordField.getText()
+				);
 
-			if (authenticatedUser != null) {
-				DashboardView dashboardView = new DashboardView(authenticatedUser, springContext);
-				SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
-			} else {
-				statusLabel.setText("Invalid email or password.");
+				if (authenticatedUser != null) {
+					DashboardView dashboardView = new DashboardView(authenticatedUser, springContext);
+					SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
+				} else {
+					statusLabel.setText("Invalid email or password.");
+				}
+			} catch (Throwable throwable) {
+				throwable.printStackTrace();
+				String details = throwable.getMessage() == null ? "" : " - " + throwable.getMessage();
+				statusLabel.setText("Login failed: " + throwable.getClass().getSimpleName() + details);
 			}
 		});
 
 		Button registerButton = new Button("Register");
 		registerButton.setId("registerButton");
 		registerButton.setOnAction(event -> {
-			User registeredUser = authenticationService.registerUser(
-				emailTextField.getText(),
-				passwordField.getText()
-			);
+			try {
+				User registeredUser = authenticationService.registerUser(
+					emailTextField.getText(),
+					passwordField.getText()
+				);
 
-			if (registeredUser != null) {
-				DashboardView dashboardView = new DashboardView(registeredUser, springContext);
-				SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
-			} else {
-				statusLabel.setText("Registration failed. Email may already exist.");
+				if (registeredUser != null) {
+					DashboardView dashboardView = new DashboardView(registeredUser, springContext);
+					SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
+				} else {
+					statusLabel.setText("Registration failed. Email may already exist.");
+				}
+			} catch (Throwable throwable) {
+				throwable.printStackTrace();
+				String details = throwable.getMessage() == null ? "" : " - " + throwable.getMessage();
+				statusLabel.setText("Registration failed: " + throwable.getClass().getSimpleName() + details);
 			}
 		});
 

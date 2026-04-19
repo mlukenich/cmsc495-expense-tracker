@@ -309,6 +309,11 @@ public class DashboardView {
 
 		try {
 			double amount = Double.parseDouble(amountTextField.getText().trim());
+			if (amount < 0) {
+				showAlert("Amount must be zero or greater.");
+				return;
+			}
+
 			expenseService.addExpense(
 				currentUser.getId(),
 				selectedCategory.getId(),
@@ -330,13 +335,18 @@ public class DashboardView {
 		Expense selectedExpense = expenseTableView.getSelectionModel().getSelectedItem();
 		Category selectedCategory = categoryComboBox.getValue();
 
-		if (selectedExpense == null || selectedCategory == null) {
+		if (selectedExpense == null || selectedCategory == null || transactionDatePicker.getValue() == null) {
 			showAlert("Please select an expense to update.");
 			return;
 		}
 
 		try {
 			double amount = Double.parseDouble(amountTextField.getText().trim());
+			if (amount < 0) {
+				showAlert("Amount must be zero or greater.");
+				return;
+			}
+
 			expenseService.updateExpense(
 				selectedExpense.getId(),
 				selectedCategory.getId(),
@@ -388,6 +398,8 @@ public class DashboardView {
 			if (!categoryName.isBlank()) {
 				categoryService.addCustomCategory(currentUser.getId(), categoryName.trim());
 				refreshCategories();
+			} else {
+				showAlert("Category name cannot be blank.");
 			}
 		});
 	}
