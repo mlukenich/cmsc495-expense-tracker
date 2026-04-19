@@ -88,7 +88,7 @@ RUN mkdir -p /root/.config/openbox && printf '\
 </openbox_config>\n' > /root/.config/openbox/rc.xml
 
 # Copy and permission the entrypoint script.
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # Declare the data directory as a mount point so Docker knows it holds

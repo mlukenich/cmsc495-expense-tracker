@@ -42,7 +42,7 @@ The Personal Expense Tracker is a desktop budgeting application built for the CM
 3. Run `mvn clean install`.
 4. Start the application with `mvn javafx:run` or `mvn spring-boot:run`.
 
-The application stores data in a local SQLite file named `expense_tracker.db` in the project directory.
+The application stores data in a local SQLite file named `expense_tracker.db` in the `data/` directory.
 
 ## Testing
 
@@ -62,3 +62,4 @@ The application stores data in a local SQLite file named `expense_tracker.db` in
 - Architecture diagram: [docs/Visuals/deployment_architecture.mmd](docs/Visuals/deployment_architecture.mmd)
 - Data model: [docs/Visuals/data_model.mmd](docs/Visuals/data_model.mmd)
 - Login sequence: [docs/Visuals/login_sequence.mmd](docs/Visuals/login_sequence.mmd)
+- Release guide: [docs/RELEASING.md](docs/RELEASING.md)
