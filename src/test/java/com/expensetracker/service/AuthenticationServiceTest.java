@@ -57,6 +57,20 @@ class AuthenticationServiceTest {
 	}
 
 	@Test
+	void registerUser_Failure_BlankEmail() {
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			authenticationService.registerUser("", testPassword);
+		});
+	}
+
+	@Test
+	void registerUser_Failure_BlankPassword() {
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			authenticationService.registerUser(testEmail, "  ");
+		});
+	}
+
+	@Test
 	void authenticateUser_Successful() {
 		User mockUser = new User(1, testEmail);
 		when(jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))

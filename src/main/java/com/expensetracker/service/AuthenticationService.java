@@ -31,6 +31,13 @@ public class AuthenticationService {
 	 * @return the created User object or null if registration fails
 	 */
 	public User registerUser(String email, String password) {
+		if (email == null || email.trim().isEmpty()) {
+			throw new IllegalArgumentException("Email cannot be blank.");
+		}
+		if (password == null || password.trim().isEmpty()) {
+			throw new IllegalArgumentException("Password cannot be blank.");
+		}
+
 		String insertUserSql = "INSERT INTO user (email, password_hash) VALUES (?, ?)";
 		try {
 			jdbcTemplate.update(insertUserSql, email.trim().toLowerCase(), hashPassword(password));

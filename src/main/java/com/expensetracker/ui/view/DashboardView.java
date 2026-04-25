@@ -63,6 +63,18 @@ public class DashboardView {
 		expenseTableView.setId("expenseTable");
 		categoryComboBox.setId("categoryCombo");
 		amountTextField.setId("amountField");
+		
+		amountTextField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			if (!newValue && !amountTextField.getText().isBlank()) {
+				try {
+					double amount = Double.parseDouble(amountTextField.getText().replace("$", "").replace(",", "").trim());
+					amountTextField.setText(String.format("$%.2f", amount));
+				} catch (NumberFormatException ignored) {
+					// Ignore invalid numbers during focus loss, wait for them to hit Add Expense to show an error
+				}
+			}
+		});
+
 		descriptionTextField.setId("descriptionField");
 		transactionDatePicker.setId("datePicker");
 		searchTextField.setId("searchField");
@@ -187,7 +199,7 @@ public class DashboardView {
 
 		expenseTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedExpense) -> {
 			if (selectedExpense != null) {
-				amountTextField.setText(String.valueOf(selectedExpense.getAmount()));
+				amountTextField.setText(String.format("%.2f", selectedExpense.getAmount()));
 				descriptionTextField.setText(selectedExpense.getDescription());
 				transactionDatePicker.setValue(LocalDate.parse(selectedExpense.getTransactionDate()));
 
@@ -240,6 +252,17 @@ public class DashboardView {
 
 		TableColumn<Expense, Double> amountColumn = new TableColumn<>("Amount");
 		amountColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getAmount()));
+		amountColumn.setCellFactory(column -> new TableCell<Expense, Double>() {
+			@Override
+			protected void updateItem(Double amount, boolean empty) {
+				super.updateItem(amount, empty);
+				if (empty || amount == null) {
+					setText(null);
+				} else {
+					setText(String.format("$%.2f", amount));
+				}
+			}
+		});
 
 		TableColumn<Expense, String> descriptionColumn = new TableColumn<>("Description");
 		descriptionColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getDescription()));
@@ -308,7 +331,7 @@ public class DashboardView {
 		}
 
 		try {
-			double amount = Double.parseDouble(amountTextField.getText().trim());
+			double amount = Double.parseDouble(amountTextField.getText().replace("$", "").replace(",", "").trim());
 			if (amount < 0) {
 				showAlert("Amount must be zero or greater.");
 				return;
@@ -341,7 +364,7 @@ public class DashboardView {
 		}
 
 		try {
-			double amount = Double.parseDouble(amountTextField.getText().trim());
+			double amount = Double.parseDouble(amountTextField.getText().replace("$", "").replace(",", "").trim());
 			if (amount < 0) {
 				showAlert("Amount must be zero or greater.");
 				return;

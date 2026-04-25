@@ -85,13 +85,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.expensetracker.Launcher</mainClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.expensetracker.MainApp</mainClass>
+                    <mainClass>com.expensetracker.Launcher</mainClass>
                 </configuration>
             </plugin>
             <plugin>
