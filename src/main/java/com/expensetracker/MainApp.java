@@ -40,11 +40,7 @@ public class MainApp extends Application {
 
 		// LoginView will now need the spring context to retrieve services
 		LoginView loginView = new LoginView(springContext);
-		Scene scene = new Scene(loginView.createView(), 1100, 750);
-
-		primaryStage.setTitle("Personal Expense Tracker");
-		primaryStage.setScene(scene);
-		primaryStage.show();
+		SceneNavigator.switchScene(loginView.createView(), "Personal Expense Tracker");
 	}
 
 	/**

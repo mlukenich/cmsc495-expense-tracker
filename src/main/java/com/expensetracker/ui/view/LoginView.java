@@ -36,7 +36,7 @@ public class LoginView {
 	public Parent createView() {
 		Label titleLabel = new Label("Personal Expense Tracker");
 		titleLabel.setId("loginTitle");
-		titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+		titleLabel.getStyleClass().add("title-label");
 
 		TextField emailTextField = new TextField();
 		emailTextField.setId("emailField");
@@ -53,6 +53,8 @@ public class LoginView {
 
 		Button loginButton = new Button("Login");
 		loginButton.setId("loginButton");
+		loginButton.getStyleClass().addAll("button", "primary-button");
+		loginButton.setMaxWidth(320);
 		loginButton.setDefaultButton(true);
 		loginButton.setOnAction(event -> {
 			try {
@@ -66,16 +68,20 @@ public class LoginView {
 					SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
 				} else {
 					statusLabel.setText("Invalid email or password.");
+					statusLabel.getStyleClass().setAll("error-text");
 				}
 			} catch (Throwable throwable) {
 				throwable.printStackTrace();
 				String details = throwable.getMessage() == null ? "" : " - " + throwable.getMessage();
 				statusLabel.setText("Login failed: " + throwable.getClass().getSimpleName() + details);
+				statusLabel.getStyleClass().setAll("error-text");
 			}
 		});
 
 		Button registerButton = new Button("Register");
 		registerButton.setId("registerButton");
+		registerButton.getStyleClass().addAll("button", "secondary-button");
+		registerButton.setMaxWidth(320);
 		registerButton.setOnAction(event -> {
 			try {
 				User registeredUser = authenticationService.registerUser(
@@ -88,16 +94,23 @@ public class LoginView {
 					SceneNavigator.switchScene(dashboardView.createView(), "Dashboard - Personal Expense Tracker");
 				} else {
 					statusLabel.setText("Registration failed. Email may already exist.");
+					statusLabel.getStyleClass().setAll("error-text");
 				}
 			} catch (Throwable throwable) {
 				throwable.printStackTrace();
 				String details = throwable.getMessage() == null ? "" : " - " + throwable.getMessage();
 				statusLabel.setText("Registration failed: " + throwable.getClass().getSimpleName() + details);
+				statusLabel.getStyleClass().setAll("error-text");
 			}
 		});
 
-		VBox rootContainer = new VBox(14, titleLabel, emailTextField, passwordField, loginButton, registerButton, statusLabel);
-		rootContainer.setPadding(new Insets(40));
+		VBox formCard = new VBox(16, titleLabel, emailTextField, passwordField, loginButton, registerButton, statusLabel);
+		formCard.getStyleClass().add("card");
+		formCard.setAlignment(Pos.CENTER);
+		formCard.setMaxWidth(400);
+
+		VBox rootContainer = new VBox(formCard);
+		rootContainer.getStyleClass().add("root");
 		rootContainer.setAlignment(Pos.CENTER);
 
 		return rootContainer;

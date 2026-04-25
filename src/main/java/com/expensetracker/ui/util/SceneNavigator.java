@@ -37,7 +37,15 @@ public class SceneNavigator {
 	 */
 	public static void switchScene(Parent root, String title) {
 		primaryStage.setTitle(title);
-		primaryStage.setScene(new Scene(root, 1100, 750));
+		Scene scene = new Scene(root, 1100, 750);
+		
+		// Load global CSS
+		java.net.URL cssUrl = SceneNavigator.class.getResource("/css/styles.css");
+		if (cssUrl != null) {
+			scene.getStylesheets().add(cssUrl.toExternalForm());
+		}
+		
+		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
 }

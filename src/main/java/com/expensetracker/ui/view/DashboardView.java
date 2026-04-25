@@ -47,6 +47,8 @@ public class DashboardView {
 	private final Label totalLabel = new Label();
 	private final PieChart categoryPieChart = new PieChart();
 	private final BarChart<String, Number> categoryBarChart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+	
+	private final VBox toastContainer = new VBox(10);
 
 	/**
 	 * Constructs a new DashboardView for the specified user and Spring application context. The constructor initializes the necessary services and UI components for displaying the dashboard.
@@ -88,15 +90,18 @@ public class DashboardView {
 	public Parent createView() {
 		Label welcomeLabel = new Label("Logged in as: " + currentUser.getEmail());
 		welcomeLabel.setId("welcomeLabel");
-		welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+		welcomeLabel.getStyleClass().add("subtitle-label");
 
 		Button logoutButton = new Button("Logout");
 		logoutButton.setId("logoutButton");
+		logoutButton.getStyleClass().addAll("button", "secondary-button");
 		logoutButton.setOnAction(event -> SceneNavigator.switchScene(new LoginView(springContext).createView(), "Personal Expense Tracker"));
 
 		HBox topBar = new HBox(12, welcomeLabel, logoutButton);
 		topBar.setAlignment(Pos.CENTER_LEFT);
-		topBar.setPadding(new Insets(12));
+		topBar.setPadding(new Insets(16, 24, 16, 24));
+		topBar.getStyleClass().add("top-bar");
+		HBox.setHgrow(welcomeLabel, Priority.ALWAYS);
 
 		configureExpenseTable();
 		configureCharts();
@@ -107,15 +112,24 @@ public class DashboardView {
 		VBox tableSection = buildExpenseTableSection();
 		VBox chartSection = buildChartSection();
 
-		SplitPane splitPane = new SplitPane();
-		splitPane.getItems().addAll(formSection, tableSection, chartSection);
-		splitPane.setDividerPositions(0.26, 0.67);
+		VBox mainContent = new VBox(24, chartSection, tableSection);
+		mainContent.setPadding(new Insets(24));
+		ScrollPane scrollPane = new ScrollPane(mainContent);
+		scrollPane.setFitToWidth(true);
+		scrollPane.setStyle("-fx-background-color: transparent; -fx-control-inner-background: transparent;");
 
 		BorderPane rootContainer = new BorderPane();
 		rootContainer.setTop(topBar);
-		rootContainer.setCenter(splitPane);
+		rootContainer.setLeft(formSection);
+		rootContainer.setCenter(scrollPane);
+		rootContainer.getStyleClass().add("root");
 
-		return rootContainer;
+		toastContainer.setAlignment(Pos.BOTTOM_RIGHT);
+		toastContainer.setPadding(new Insets(24));
+		toastContainer.setPickOnBounds(false);
+
+		javafx.scene.layout.StackPane stackRoot = new javafx.scene.layout.StackPane(rootContainer, toastContainer);
+		return stackRoot;
 	}
 
 	/*
@@ -124,7 +138,7 @@ public class DashboardView {
 	 */
 	private VBox buildExpenseFormSection() {
 		Label formTitleLabel = new Label("Expense Entry");
-		formTitleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+		formTitleLabel.getStyleClass().add("subtitle-label");
 
 		amountTextField.setPromptText("Amount");
 		descriptionTextField.setPromptText("Description");
@@ -132,32 +146,45 @@ public class DashboardView {
 
 		Button addExpenseButton = new Button("Add Expense");
 		addExpenseButton.setId("addExpenseButton");
+		addExpenseButton.getStyleClass().addAll("button", "primary-button");
 		addExpenseButton.setMaxWidth(Double.MAX_VALUE);
 		addExpenseButton.setOnAction(event -> addExpense());
 
-		Button updateSelectedExpenseButton = new Button("Update Selected");
+		Button updateSelectedExpenseButton = new Button("Update Expense");
 		updateSelectedExpenseButton.setId("updateButton");
+		updateSelectedExpenseButton.getStyleClass().addAll("button", "primary-button");
 		updateSelectedExpenseButton.setMaxWidth(Double.MAX_VALUE);
 		updateSelectedExpenseButton.setOnAction(event -> updateSelectedExpense());
 
-		Button deleteSelectedExpenseButton = new Button("Delete Selected");
-		deleteSelectedExpenseButton.setId("deleteButton");
-		deleteSelectedExpenseButton.setMaxWidth(Double.MAX_VALUE);
-		deleteSelectedExpenseButton.setOnAction(event -> deleteSelectedExpense());
+		Button cancelEditButton = new Button("Cancel Edit");
+		cancelEditButton.getStyleClass().addAll("button", "secondary-button");
+		cancelEditButton.setMaxWidth(Double.MAX_VALUE);
+		cancelEditButton.setOnAction(event -> clearForm());
 
-		Button addCategoryButton = new Button("Add Custom Category");
+		// Toggle visibility based on selection
+		updateSelectedExpenseButton.visibleProperty().bind(expenseTableView.getSelectionModel().selectedItemProperty().isNotNull());
+		updateSelectedExpenseButton.managedProperty().bind(updateSelectedExpenseButton.visibleProperty());
+		cancelEditButton.visibleProperty().bind(updateSelectedExpenseButton.visibleProperty());
+		cancelEditButton.managedProperty().bind(cancelEditButton.visibleProperty());
+
+		addExpenseButton.visibleProperty().bind(expenseTableView.getSelectionModel().selectedItemProperty().isNull());
+		addExpenseButton.managedProperty().bind(addExpenseButton.visibleProperty());
+
+		Button addCategoryButton = new Button("+ Custom Category");
 		addCategoryButton.setId("addCategoryButton");
+		addCategoryButton.getStyleClass().addAll("button", "secondary-button");
 		addCategoryButton.setMaxWidth(Double.MAX_VALUE);
 		addCategoryButton.setOnAction(event -> addCustomCategory());
 
 		Button searchButton = new Button("Search");
 		searchButton.setId("searchButton");
+		searchButton.getStyleClass().addAll("button", "primary-button");
 		searchButton.setMaxWidth(Double.MAX_VALUE);
 		searchButton.setOnAction(event -> refreshExpenseData());
 
 		GridPane formGridPane = new GridPane();
 		formGridPane.setHgap(8);
-		formGridPane.setVgap(8);
+		formGridPane.setVgap(12);
 
 		formGridPane.add(new Label("Category"), 0, 0);
 		formGridPane.add(categoryComboBox, 1, 0);
@@ -169,12 +196,12 @@ public class DashboardView {
 		formGridPane.add(transactionDatePicker, 1, 3);
 
 		VBox formSection = new VBox(
-			10,
+			16,
 			formTitleLabel,
 			formGridPane,
 			addExpenseButton,
 			updateSelectedExpenseButton,
-			deleteSelectedExpenseButton,
+			cancelEditButton,
 			new Separator(),
 			addCategoryButton,
 			new Separator(),
@@ -182,7 +209,9 @@ public class DashboardView {
 			searchTextField,
 			searchButton
 		);
-		formSection.setPadding(new Insets(16));
+		formSection.setPadding(new Insets(24));
+		formSection.setPrefWidth(320);
+		formSection.getStyleClass().add("sidebar");
 
 		return formSection;
 	}
@@ -193,9 +222,9 @@ public class DashboardView {
 	 */
 	private VBox buildExpenseTableSection() {
 		Label tableTitleLabel = new Label("Expenses");
-		tableTitleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+		tableTitleLabel.getStyleClass().add("subtitle-label");
 
-		totalLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+		totalLabel.getStyleClass().add("subtitle-label");
 
 		expenseTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedExpense) -> {
 			if (selectedExpense != null) {
@@ -212,8 +241,8 @@ public class DashboardView {
 			}
 		});
 
-		VBox tableSection = new VBox(10, tableTitleLabel, totalLabel, expenseTableView);
-		tableSection.setPadding(new Insets(16));
+		VBox tableSection = new VBox(16, tableTitleLabel, totalLabel, expenseTableView);
+		tableSection.getStyleClass().add("card");
 		VBox.setVgrow(expenseTableView, Priority.ALWAYS);
 		return tableSection;
 	}
@@ -224,16 +253,18 @@ public class DashboardView {
 	 */
 	private VBox buildChartSection() {
 		Label chartTitleLabel = new Label("Reports");
-		chartTitleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+		chartTitleLabel.getStyleClass().add("subtitle-label");
 
 		categoryPieChart.setLegendVisible(true);
 		categoryBarChart.setLegendVisible(false);
 		categoryBarChart.setTitle("Spending by Category");
 
-		VBox chartSection = new VBox(10, chartTitleLabel, categoryPieChart, categoryBarChart);
-		chartSection.setPadding(new Insets(16));
-		VBox.setVgrow(categoryPieChart, Priority.ALWAYS);
-		VBox.setVgrow(categoryBarChart, Priority.ALWAYS);
+		HBox charts = new HBox(24, categoryPieChart, categoryBarChart);
+		HBox.setHgrow(categoryPieChart, Priority.ALWAYS);
+		HBox.setHgrow(categoryBarChart, Priority.ALWAYS);
+
+		VBox chartSection = new VBox(16, chartTitleLabel, charts);
+		chartSection.getStyleClass().add("card");
 		return chartSection;
 	}
 
@@ -267,7 +298,40 @@ public class DashboardView {
 		TableColumn<Expense, String> descriptionColumn = new TableColumn<>("Description");
 		descriptionColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getDescription()));
 
-		expenseTableView.getColumns().addAll(idColumn, dateColumn, categoryColumn, amountColumn, descriptionColumn);
+		TableColumn<Expense, Void> actionsColumn = new TableColumn<>("Actions");
+		actionsColumn.setCellFactory(param -> new TableCell<>() {
+			private final Button editBtn = new Button("✎ Edit");
+			private final Button deleteBtn = new Button("✕ Delete");
+			private final HBox pane = new HBox(8, editBtn, deleteBtn);
+
+			{
+				editBtn.getStyleClass().add("action-button");
+				deleteBtn.getStyleClass().addAll("action-button", "danger-button");
+
+				editBtn.setOnAction(event -> {
+					Expense expense = getTableView().getItems().get(getIndex());
+					expenseTableView.getSelectionModel().select(expense);
+				});
+
+				deleteBtn.setOnAction(event -> {
+					Expense expense = getTableView().getItems().get(getIndex());
+					expenseTableView.getSelectionModel().select(expense);
+					deleteSelectedExpense();
+				});
+			}
+
+			@Override
+			protected void updateItem(Void item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty) {
+					setGraphic(null);
+				} else {
+					setGraphic(pane);
+				}
+			}
+		});
+
+		expenseTableView.getColumns().addAll(idColumn, dateColumn, categoryColumn, amountColumn, descriptionColumn, actionsColumn);
 		expenseTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 	}
 
@@ -346,6 +410,7 @@ public class DashboardView {
 			);
 			clearForm();
 			refreshExpenseData();
+			showToast("Expense added successfully!", false);
 		} catch (NumberFormatException exception) {
 			showAlert("Amount must be a valid number.");
 		}
@@ -379,6 +444,7 @@ public class DashboardView {
 			);
 			clearForm();
 			refreshExpenseData();
+			showToast("Expense updated successfully!", false);
 		} catch (NumberFormatException exception) {
 			showAlert("Amount must be a valid number.");
 		}
@@ -404,6 +470,7 @@ public class DashboardView {
 			expenseService.deleteExpense(selectedExpense.getId());
 			clearForm();
 			refreshExpenseData();
+			showToast("Expense deleted.", false);
 		}
 	}
 
@@ -442,10 +509,18 @@ public class DashboardView {
 	 * @param message the message to display in the alert
 	 */
 	private void showAlert(String message) {
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Expense Tracker");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-		alert.showAndWait();
+		showToast(message, true);
+	}
+
+	private void showToast(String message, boolean isError) {
+		javafx.application.Platform.runLater(() -> {
+			Label toast = new Label(message);
+			toast.getStyleClass().add(isError ? "toast-error" : "toast-success");
+			toastContainer.getChildren().add(toast);
+
+			javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(4));
+			delay.setOnFinished(e -> toastContainer.getChildren().remove(toast));
+			delay.play();
+		});
 	}
 }
